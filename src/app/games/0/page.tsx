@@ -11,12 +11,14 @@ import {
   makeMesh,
 } from "@/utils/threejs";
 import { Monster } from "@/models/threejs/Monster";
+import { Player } from "@/models/threejs/Player";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
+  const playerRef = useRef<any>(null);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
@@ -27,6 +29,8 @@ const Page = () => {
     cameraRef.current = createCamera();
     cameraRef.current.position.set(0, 0, 10);
     rendererRef.current = createRenderer();
+    const player = new Player({});
+    playerRef.current = player;
     setIsMounted(true);
   }, []);
 
@@ -36,6 +40,7 @@ const Page = () => {
       const camera = cameraRef.current;
       const renderer = rendererRef.current;
       const scene = sceneRef.current;
+      const player = playerRef.current;
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -47,7 +52,9 @@ const Page = () => {
       });
 
       const m = monster.create();
+      const p = player.create();
       scene.add(m);
+      scene.add(p);
 
       let id: any;
       const animate = () => {
@@ -55,6 +62,8 @@ const Page = () => {
 
         monster.move();
         monster.jump();
+
+        player.jump();
 
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
@@ -64,6 +73,20 @@ const Page = () => {
 
       return () => {
         cancelAnimationFrame(id);
+      };
+    }
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (isMounted) {
+      const player = playerRef.current;
+      const keyboardEvent = (e: KeyboardEvent) => {
+        const code = e.code;
+        if (code === "Space") player.space();
+      };
+      window.addEventListener("keypress", keyboardEvent);
+      return () => {
+        window.removeEventListener("keypress", keyboardEvent);
       };
     }
   }, [isMounted]);
