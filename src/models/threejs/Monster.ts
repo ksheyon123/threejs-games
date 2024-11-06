@@ -26,17 +26,14 @@ export class Monster {
     const { x, y, z } = this.position;
     this.obj.position.set(x, y, z);
     this.isCreated = true;
-    setInterval(() => (this.isJumping = true), timer);
+    // setInterval(() => (this.isJumping = true), timer);
     return mesh;
   }
 
   move() {
     if (this.isCreated) {
       const { x, y, z } = this.obj!.position.clone();
-      if (x < -10) {
-        this.delete();
-      }
-      this.obj!.position.set(x - 0.1, y, z);
+      this.obj!.position.set(x - this.velocity, y, z);
     }
   }
 
@@ -66,6 +63,7 @@ export class Monster {
   delete() {
     if (this.isCreated) {
       this.obj!.removeFromParent();
+      return this.obj!.uuid;
     }
   }
 }

@@ -46,32 +46,45 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      const monster = new Monster({
-        velocity: 1,
-        w: 1,
-        h: 1,
-        position: new THREE.Vector3(10, 0, 0),
-      });
       const gauge = new Gauge({ initHP: 10, maxHP: 10 });
       const g = gauge.create();
       g.position.set(0, 5, 0);
       scene.add(g);
 
-      const m = monster.create();
-      scene.add(m);
-
       const p = player.create(new THREE.Vector3(-10, 0, 0));
       scene.add(p);
 
+      let monsters: Monster[] = [];
+      let intervalId = setInterval(() => {
+        const vel = Math.random() / 2;
+        monster = new Monster({
+          velocity: vel,
+          w: 1,
+          h: 1,
+          position: new THREE.Vector3(10, 0, 0),
+        });
+        const m = monster.create();
+        scene.add(m);
+        monsters.push(monster);
+      }, 600);
+
       let id: any;
+      let monster: any;
       const animate = () => {
         const list = scene.children.filter(
           (el: THREE.Mesh) => el.name === "monster"
         );
+        if (list.length === 0) {
+        }
         controls.update();
 
-        monster.move();
-        monster.jump();
+        monsters.map((monster: Monster, idx: number) => {
+          monster.move();
+          monster.jump();
+          if (monster.obj!.position.x < -10) {
+            monster.delete();
+          }
+        });
 
         player.jump();
         player.collisionChk(list);
