@@ -19,13 +19,14 @@ export class Monster {
     this.position = props.position;
   }
 
-  create() {
+  create(timer = 600) {
     const mesh = makePlane(this.w, this.h, 0x000000, false);
+    mesh.name = "monster";
     this.obj = mesh;
     const { x, y, z } = this.position;
     this.obj.position.set(x, y, z);
     this.isCreated = true;
-    setInterval(() => (this.isJumping = true), 3000);
+    setInterval(() => (this.isJumping = true), timer);
     return mesh;
   }
 
@@ -45,16 +46,17 @@ export class Monster {
       if (this.isJumping) {
         if (!this.isFalling) {
           if (y <= 2) {
-            this.obj!.position.set(x, y + 0.2, z);
+            this.obj!.position.set(x, y + 0.1, z);
           } else {
             this.isFalling = true;
           }
         } else {
           if (y > 0) {
-            this.obj!.position.set(x, y - 0.2, z);
+            this.obj!.position.set(x, y - 0.1, z);
           } else {
             this.obj!.position.set(x, 0, z);
             this.isJumping = false;
+            this.isFalling = false;
           }
         }
       }

@@ -25,6 +25,7 @@ const Page = () => {
   const hz = 1 / 60; //seconds
 
   useEffect(() => {
+    console.log("IS LOADED");
     sceneRef.current = createScene();
     cameraRef.current = createCamera();
     cameraRef.current.position.set(0, 0, 10);
@@ -36,7 +37,7 @@ const Page = () => {
 
   useEffect(() => {
     if (isMounted) {
-      console.log("IS LOADED");
+      console.log("IS MOUNTED");
       const camera = cameraRef.current;
       const renderer = rendererRef.current;
       const scene = sceneRef.current;
@@ -52,19 +53,25 @@ const Page = () => {
       });
 
       const m = monster.create();
-      const p = player.create();
       scene.add(m);
+
+      const p = player.create();
       scene.add(p);
 
       let id: any;
       const animate = () => {
+        const list = scene.children.filter(
+          (el: THREE.Mesh) => el.name === "monster"
+        );
         controls.update();
 
         monster.move();
         monster.jump();
 
         player.jump();
+        player.collisionChk(list);
 
+        const life = player.getLife();
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
       };
@@ -82,7 +89,7 @@ const Page = () => {
       const player = playerRef.current;
       const keyboardEvent = (e: KeyboardEvent) => {
         const code = e.code;
-        if (code === "Space") player.space();
+        if (code === "Space") player!.space();
       };
       window.addEventListener("keypress", keyboardEvent);
       return () => {

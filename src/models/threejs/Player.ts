@@ -6,20 +6,21 @@ export class Player {
 
   obj: THREE.Mesh | null = null;
   life = 10;
+  point = 0;
   isCreated = false;
   isJumping = false;
   isFalling = false;
 
   create(init?: THREE.Vector3) {
-    const player = makePlane(1, 1, 0xffff00, false);
+    const mesh = makePlane(1, 1, 0xffff00, false);
+    mesh.name = "player";
     this.isCreated = true;
-    this.obj = player;
-    player.name = "player";
+    this.obj = mesh;
 
     const { x, y, z } = init || new THREE.Vector3();
 
-    player.position.set(x, y, z);
-    return player;
+    mesh.position.set(x, y, z);
+    return mesh;
   }
 
   space() {
@@ -51,5 +52,21 @@ export class Player {
     }
   }
 
-  collisionChk(list: THREE.Mesh[]) {}
+  collisionChk(list: THREE.Mesh[]) {
+    if (this.isCreated) {
+      const box1 = new THREE.Box3().setFromObject(this.obj!);
+      list.map((mesh: THREE.Mesh) => {
+        const box2 = new THREE.Box3().setFromObject(mesh);
+        const isCollided = box1.intersectsBox(box2);
+        if (isCollided) {
+          mesh.removeFromParent();
+          this.life--;
+        }
+      });
+    }
+  }
+
+  getLife() {
+    return this.life;
+  }
 }
