@@ -63,6 +63,29 @@ export const makePlane = (
   return plane;
 };
 
+export const makeGuage = (initHP: number, maxHP: number) => {
+  const gaugeGroup = new THREE.Group(); // 전체 게이지 바를 담을 그룹
+
+  // 게이지 바 배경
+  const backgroundGeometry = new THREE.PlaneGeometry(2.2, 0.3); // 배경 크기 설정
+  const backgroundMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 }); // 어두운 배경 색상
+  const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+  background.name = "gauge-background";
+  gaugeGroup.add(background);
+
+  // HP 게이지 바
+  const hpGeometry = new THREE.PlaneGeometry(2, 0.2); // 체력 게이지 크기 설정
+  const hpMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // 체력 바 색상 (빨간색)
+  const hpBar = new THREE.Mesh(hpGeometry, hpMaterial);
+  hpBar.name = "gauge-bar";
+  hpBar.geometry.translate(1, 0, 0);
+  hpBar.position.set(-1.05, 0, 0.01); // 배경보다 약간 앞에 위치시킴
+  hpBar.translateX(0.05);
+  hpBar.scale.x = initHP / maxHP; // 초기 체력에 따라 게이지 바의 넓이 설정
+  gaugeGroup.add(hpBar);
+  return gaugeGroup;
+};
+
 export const makeMesh = (
   width?: number,
   height?: number,

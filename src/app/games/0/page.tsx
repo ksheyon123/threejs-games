@@ -12,6 +12,7 @@ import {
 } from "@/utils/threejs";
 import { Monster } from "@/models/threejs/Monster";
 import { Player } from "@/models/threejs/Player";
+import { Gauge } from "@/models/threejs/Gauge";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -51,11 +52,15 @@ const Page = () => {
         h: 1,
         position: new THREE.Vector3(10, 0, 0),
       });
+      const gauge = new Gauge({ initHP: 10, maxHP: 10 });
+      const g = gauge.create();
+      g.position.set(0, 5, 0);
+      scene.add(g);
 
       const m = monster.create();
       scene.add(m);
 
-      const p = player.create();
+      const p = player.create(new THREE.Vector3(-10, 0, 0));
       scene.add(p);
 
       let id: any;
@@ -72,6 +77,7 @@ const Page = () => {
         player.collisionChk(list);
 
         const life = player.getLife();
+        gauge.update(life);
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
       };
