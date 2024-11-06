@@ -54,6 +54,7 @@ const Page = () => {
         controls.update();
 
         monster.move();
+        monster.jump();
 
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);

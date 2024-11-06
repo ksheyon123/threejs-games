@@ -10,6 +10,7 @@ export class Monster {
   position: THREE.Vector3 = new THREE.Vector3();
   isCreated: boolean = false;
   isJumping: boolean = false;
+  isFalling: boolean = false;
 
   constructor(props: MonsterType) {
     this.velocity = props.velocity;
@@ -24,17 +25,41 @@ export class Monster {
     const { x, y, z } = this.position;
     this.obj.position.set(x, y, z);
     this.isCreated = true;
+    setInterval(() => (this.isJumping = true), 3000);
     return mesh;
   }
 
   move() {
     if (this.isCreated) {
       const { x, y, z } = this.obj!.position.clone();
+      if (x < -10) {
+        this.delete();
+      }
       this.obj!.position.set(x - 0.1, y, z);
     }
   }
 
-  jump() {}
+  jump() {
+    if (this.isCreated) {
+      const { x, y, z } = this.obj!.position.clone();
+      if (this.isJumping) {
+        if (!this.isFalling) {
+          if (y <= 2) {
+            this.obj!.position.set(x, y + 0.2, z);
+          } else {
+            this.isFalling = true;
+          }
+        } else {
+          if (y > 0) {
+            this.obj!.position.set(x, y - 0.2, z);
+          } else {
+            this.obj!.position.set(x, 0, z);
+            this.isJumping = false;
+          }
+        }
+      }
+    }
+  }
 
   delete() {
     if (this.isCreated) {
