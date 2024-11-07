@@ -1,72 +1,80 @@
 import { makePlane } from "@/utils/threejs";
 import * as THREE from "three";
 
-export class Player {
-  constructor(props: any) {}
+export const createPlayer = () => {
+  let obj: THREE.Mesh | null = null;
+  let life = 10;
+  let point = 0;
+  let isCreated = false;
+  let isJumping = false;
+  let isFalling = false;
 
-  obj: THREE.Mesh | null = null;
-  life = 10;
-  point = 0;
-  isCreated = false;
-  isJumping = false;
-  isFalling = false;
-
-  create(init?: THREE.Vector3) {
+  const create = (init?: THREE.Vector3) => {
     const mesh = makePlane(1, 1, 0xffff00, false);
     mesh.name = "player";
-    this.isCreated = true;
-    this.obj = mesh;
+    isCreated = true;
+    obj = mesh;
 
     const { x, y, z } = init || new THREE.Vector3();
 
     mesh.position.set(x, y, z);
     return mesh;
-  }
+  };
 
-  space() {
-    if (!this.isJumping) {
-      this.isJumping = true;
+  const keyboardEvent = (e: KeyboardEvent) => {
+    const code = e.code;
+    if (code === "Space") {
+      if (!isJumping) {
+        isJumping = true;
+      }
     }
-  }
+  };
 
-  jump() {
-    if (this.isCreated) {
-      const { x, y, z } = this.obj!.position.clone();
-      if (this.isJumping) {
-        if (!this.isFalling) {
+  const jump = () => {
+    if (isCreated) {
+      const { x, y, z } = obj!.position.clone();
+      if (isJumping) {
+        if (!isFalling) {
           if (y <= 2) {
-            this.obj!.position.set(x, y + 0.2, z);
+            obj!.position.set(x, y + 0.2, z);
           } else {
-            this.isFalling = true;
+            isFalling = true;
           }
         } else {
           if (y > 0) {
-            this.obj!.position.set(x, y - 0.2, z);
+            obj!.position.set(x, y - 0.2, z);
           } else {
-            this.obj!.position.set(x, 0, z);
-            this.isJumping = false;
-            this.isFalling = false;
+            obj!.position.set(x, 0, z);
+            isJumping = false;
+            isFalling = false;
           }
         }
       }
     }
-  }
+  };
 
-  collisionChk(list: THREE.Mesh[]) {
-    if (this.isCreated) {
-      const box1 = new THREE.Box3().setFromObject(this.obj!);
+  const collisionChk = (list: THREE.Mesh[]) => {
+    if (isCreated) {
+      const box1 = new THREE.Box3().setFromObject(obj!);
       list.map((mesh: THREE.Mesh) => {
         const box2 = new THREE.Box3().setFromObject(mesh);
         const isCollided = box1.intersectsBox(box2);
         if (isCollided) {
           mesh.removeFromParent();
-          this.life--;
+          life--;
         }
       });
     }
-  }
+  };
 
-  getLife() {
-    return this.life;
-  }
-}
+  const getLife = () => {
+    return life;
+  };
+  return {
+    create,
+    keyboardEvent,
+    jump,
+    collisionChk,
+    getLife,
+  };
+};

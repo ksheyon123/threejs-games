@@ -11,7 +11,7 @@ import {
   makeMesh,
 } from "@/utils/threejs";
 import { Monster } from "@/models/threejs/Monster";
-import { Player } from "@/models/threejs/Player";
+import { createPlayer } from "@/models/threejs/Player";
 import { Gauge } from "@/models/threejs/Gauge";
 
 const Page = () => {
@@ -31,8 +31,6 @@ const Page = () => {
     cameraRef.current = createCamera();
     cameraRef.current.position.set(0, 0, 10);
     rendererRef.current = createRenderer();
-    const player = new Player({});
-    playerRef.current = player;
     setIsMounted(true);
   }, []);
 
@@ -42,7 +40,8 @@ const Page = () => {
       const camera = cameraRef.current;
       const renderer = rendererRef.current;
       const scene = sceneRef.current;
-      const player = playerRef.current;
+      const { create, jump, collisionChk, getLife, keyboardEvent } =
+        createPlayer();
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -51,7 +50,8 @@ const Page = () => {
       g.position.set(0, 5, 0);
       scene.add(g);
 
-      const p = player.create(new THREE.Vector3(-10, 0, 0));
+      // const p = player.create(new THREE.Vector3(-10, 0, 0));
+      const p = create(new THREE.Vector3(-10, 0, 0));
       scene.add(p);
 
       let monsters: Monster[] = [];
@@ -86,10 +86,10 @@ const Page = () => {
           }
         });
 
-        player.jump();
-        player.collisionChk(list);
+        jump();
+        collisionChk(list);
 
-        const life = player.getLife();
+        const life = getLife();
         gauge.update(life);
         id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
@@ -97,25 +97,24 @@ const Page = () => {
 
       animate();
 
-      return () => {
-        cancelAnimationFrame(id);
-      };
-    }
-  }, [isMounted]);
-
-  useEffect(() => {
-    if (isMounted) {
-      const player = playerRef.current;
-      const keyboardEvent = (e: KeyboardEvent) => {
-        const code = e.code;
-        if (code === "Space") player!.space();
-      };
       window.addEventListener("keypress", keyboardEvent);
       return () => {
+        cancelAnimationFrame(id);
         window.removeEventListener("keypress", keyboardEvent);
       };
     }
   }, [isMounted]);
+
+  // useEffect(() => {
+  //   if (isMounted) {
+  //     const player = playerRef.current;
+
+  //     window.addEventListener("keypress", keyboardEvent);
+  //     return () => {
+  //       window.removeEventListener("keypress", keyboardEvent);
+  //     };
+  //   }
+  // }, [isMounted]);
 
   return (
     <div

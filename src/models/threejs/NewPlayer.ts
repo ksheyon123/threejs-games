@@ -21,9 +21,7 @@ export const createPlayer = (initial: THREE.Vector3) => {
     if (code === "KeyD") {
       tempP.add(new THREE.Vector3(1, 0, 0));
     }
-
     if (!(tempP.x < -6.5 || tempP.x > 6.5)) {
-      currentPosition.copy(tempP);
       player.position.copy(currentPosition);
     }
   };
