@@ -1,7 +1,7 @@
 import { makePlane } from "@/utils/threejs";
 import * as THREE from "three";
 
-export const createPlayer = () => {
+export const usePlayer = () => {
   let obj: THREE.Mesh | null = null;
   let life = 10;
   let point = 0;

@@ -3,6 +3,13 @@ import { MonsterType } from "@/types/model.type";
 import { makeMesh, makePlane } from "@/utils/threejs";
 
 export class Monster {
+  constructor(props: MonsterType) {
+    this.velocity = props.velocity;
+    this.w = props.w;
+    this.h = props.h;
+    this.position = props.position;
+  }
+
   velocity: number = 1;
   w: number = 1;
   h: number = 1;
@@ -11,13 +18,6 @@ export class Monster {
   isCreated: boolean = false;
   isJumping: boolean = false;
   isFalling: boolean = false;
-
-  constructor(props: MonsterType) {
-    this.velocity = props.velocity;
-    this.w = props.w;
-    this.h = props.h;
-    this.position = props.position;
-  }
 
   create(timer = 600) {
     const mesh = makePlane(this.w, this.h, 0x000000, false);

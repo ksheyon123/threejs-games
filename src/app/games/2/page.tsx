@@ -49,7 +49,7 @@ const Page = () => {
       scene.add(group);
 
       setTimeout(() => {
-        group.removeFromParent();
+        mesh2.removeFromParent();
       }, 3000);
       let id: any;
       const animate = () => {

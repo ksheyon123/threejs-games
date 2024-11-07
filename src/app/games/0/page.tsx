@@ -11,7 +11,7 @@ import {
   makeMesh,
 } from "@/utils/threejs";
 import { Monster } from "@/models/threejs/Monster";
-import { createPlayer } from "@/models/threejs/Player";
+import { usePlayer } from "@/hooks/usePlayer";
 import { Gauge } from "@/models/threejs/Gauge";
 
 const Page = () => {
@@ -19,9 +19,10 @@ const Page = () => {
   const sceneRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
-  const playerRef = useRef<any>(null);
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  const { create, jump, collisionChk, getLife, keyboardEvent } = usePlayer();
 
   const hz = 1 / 60; //seconds
 
@@ -40,8 +41,7 @@ const Page = () => {
       const camera = cameraRef.current;
       const renderer = rendererRef.current;
       const scene = sceneRef.current;
-      const { create, jump, collisionChk, getLife, keyboardEvent } =
-        createPlayer();
+
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
