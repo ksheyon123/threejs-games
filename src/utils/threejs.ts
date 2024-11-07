@@ -145,3 +145,13 @@ export const makeSphere = (
   const sphere = new THREE.Mesh(geometry, material);
   return sphere;
 };
+
+export const calMove = (
+  mesh: THREE.Mesh,
+  direction: THREE.Vector3,
+  speed: number = 1
+) => {
+  const curPosition = mesh.position.clone();
+  curPosition.add(direction.multiplyScalar(speed));
+  return curPosition;
+};

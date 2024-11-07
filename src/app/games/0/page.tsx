@@ -5,6 +5,7 @@ import { RefObject, useEffect, useRef, useState } from "react";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
+  calMove,
   createCamera,
   createRenderer,
   createScene,
@@ -54,10 +55,9 @@ const Page = () => {
       const p = create(new THREE.Vector3(-10, 0, 0));
       scene.add(p);
 
-      let monsters: Monster[] = [];
       let intervalId = setInterval(() => {
         const vel = Math.random() / 2;
-        monster = new Monster({
+        const monster = new Monster({
           velocity: vel,
           w: 1,
           h: 1,
@@ -65,27 +65,28 @@ const Page = () => {
         });
         const m = monster.create();
         scene.add(m);
-        monsters.push(monster);
       }, 600);
 
       let id: any;
-      let monster: any;
       const animate = () => {
         const list = scene.children.filter(
           (el: THREE.Mesh) => el.name === "monster"
         );
-        if (list.length === 0) {
-        }
         controls.update();
 
-        monsters.map((monster: Monster, idx: number) => {
-          monster.move();
-          monster.jump();
-          if (monster.obj!.position.x < -10) {
-            monster.delete();
+        list.map((monster: THREE.Mesh, idx: number) => {
+          const newPosition = calMove(
+            monster,
+            new THREE.Vector3(-1, 0, 0),
+            0.2
+          );
+          if (newPosition.x < -10) {
+            monster.removeFromParent();
           }
+          monster.position.copy(newPosition);
         });
 
+        // Player Control
         jump();
         collisionChk(list);
 

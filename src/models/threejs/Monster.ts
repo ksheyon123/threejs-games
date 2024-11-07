@@ -26,11 +26,15 @@ export class Monster {
     const { x, y, z } = this.position;
     this.obj.position.set(x, y, z);
     this.isCreated = true;
-    // setInterval(() => (this.isJumping = true), timer);
+
+    mesh.userData = {
+      move: this.move,
+      jump: this.jump,
+    };
     return mesh;
   }
 
-  move() {
+  move(mesh: THREE.Vector3) {
     if (this.isCreated) {
       const { x, y, z } = this.obj!.position.clone();
       this.obj!.position.set(x - this.velocity, y, z);
