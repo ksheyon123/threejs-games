@@ -25,8 +25,16 @@ const Page = () => {
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
-  const { create, jump, collisionChk, getLife, keyDownEvent, keyUpEvent } =
-    usePlayer();
+  const {
+    create,
+    jump,
+    collisionChk,
+    getLife,
+    keyDownEvent,
+    keyUpEvent,
+    addPoint,
+    getPoint: pGetPoint,
+  } = usePlayer();
   const { create: createMonster } = useMonster();
   const { create: createPoint } = usePoint();
 
@@ -104,7 +112,10 @@ const Page = () => {
         }
         jump();
         collisionChk(list);
-
+        getPoint(p, group, () => {
+          addPoint();
+        });
+        const point = pGetPoint();
         const life = getLife();
         gauge.update(life);
         renderer.render(scene, camera);
@@ -123,6 +134,28 @@ const Page = () => {
       };
     }
   }, [isMounted]);
+
+  const getPoint = (
+    player: THREE.Mesh,
+    target: THREE.Group | THREE.Mesh,
+    cb?: Function
+  ) => {
+    if (target) {
+      const box1 = new THREE.Box3().setFromObject(player);
+      const box2 = new THREE.Box3().setFromObject(target);
+      const isCollided = box1.intersectsBox(box2);
+      if (isCollided) {
+        if (target instanceof THREE.Group) {
+          target.children.forEach((child) => child.removeFromParent());
+        } else {
+          target.removeFromParent();
+        }
+        if (cb) {
+          cb();
+        }
+      }
+    }
+  };
 
   return (
     <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>

@@ -97,6 +97,14 @@ export const usePlayer = () => {
   const getLife = () => {
     return life;
   };
+
+  const addPoint = () => {
+    point++;
+  };
+
+  const getPoint = () => {
+    return point;
+  };
   return {
     create,
     keyDownEvent,
@@ -104,5 +112,7 @@ export const usePlayer = () => {
     jump,
     collisionChk,
     getLife,
+    addPoint,
+    getPoint,
   };
 };
