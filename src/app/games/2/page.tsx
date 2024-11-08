@@ -39,18 +39,6 @@ const Page = () => {
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      const mesh1 = makePlane(2, 2, 0x000000, false);
-      const mesh2 = makePlane(2, 2, 0xff0000, false);
-      mesh2.position.set(2, 2, 0);
-      const group = new THREE.Group();
-      group.add(mesh1);
-      group.add(mesh2);
-
-      scene.add(group);
-
-      setTimeout(() => {
-        mesh2.removeFromParent();
-      }, 3000);
       let id: any;
       const animate = () => {
         controls.update();

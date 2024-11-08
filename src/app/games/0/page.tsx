@@ -14,6 +14,8 @@ import {
 import { Monster } from "@/models/threejs/Monster";
 import { usePlayer } from "@/hooks/usePlayer";
 import { Gauge } from "@/models/threejs/Gauge";
+import { useMonster } from "@/hooks/useMonster";
+import { usePoint } from "@/hooks/usePoint";
 
 const Page = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -23,9 +25,10 @@ const Page = () => {
 
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
-  const { create, jump, collisionChk, getLife, keyboardEvent } = usePlayer();
-
-  const hz = 1 / 60; //seconds
+  const { create, jump, collisionChk, getLife, keyDownEvent, keyUpEvent } =
+    usePlayer();
+  const { create: createMonster } = useMonster();
+  const { create: createPoint } = usePoint();
 
   useEffect(() => {
     console.log("IS LOADED");
@@ -48,27 +51,30 @@ const Page = () => {
 
       const gauge = new Gauge({ initHP: 10, maxHP: 10 });
       const g = gauge.create();
-      g.position.set(0, 5, 0);
+      g.position.set(-10, 5, 0);
       scene.add(g);
 
-      // const p = player.create(new THREE.Vector3(-10, 0, 0));
       const p = create(new THREE.Vector3(-10, 0, 0));
       scene.add(p);
 
       let intervalId = setInterval(() => {
-        const vel = Math.random() / 2;
-        const monster = new Monster({
-          velocity: vel,
-          w: 1,
-          h: 1,
-          position: new THREE.Vector3(10, 0, 0),
-        });
-        const m = monster.create();
-        scene.add(m);
-      }, 600);
+        const rndTimer = Math.random() * 5000;
+        const monster = createMonster(rndTimer);
+        scene.add(monster);
+      }, 1200);
+
+      const { emerald, ambientLight, directionalLight } = createPoint();
+      const group = new THREE.Group();
+
+      group.add(emerald);
+      group.add(ambientLight);
+      group.add(directionalLight);
+
+      scene.add(group);
 
       let id: any;
       const animate = () => {
+        id = requestAnimationFrame(animate);
         const list = scene.children.filter(
           (el: THREE.Mesh) => el.name === "monster"
         );
@@ -84,44 +90,44 @@ const Page = () => {
             monster.removeFromParent();
           }
           monster.position.copy(newPosition);
+          monster.userData.jump(monster);
         });
 
         // Player Control
+        if (p.userData["KeyD"]) {
+          const newPosition = calMove(p, new THREE.Vector3(1, 0, 0), 0.2);
+          p.position.copy(newPosition);
+        }
+        if (p.userData["KeyA"]) {
+          const newPosition = calMove(p, new THREE.Vector3(-1, 0, 0), 0.2);
+          p.position.copy(newPosition);
+        }
         jump();
         collisionChk(list);
 
         const life = getLife();
         gauge.update(life);
-        id = requestAnimationFrame(animate);
         renderer.render(scene, camera);
+        emerald.rotation.y += 0.03;
       };
 
       animate();
 
-      window.addEventListener("keypress", keyboardEvent);
+      window.addEventListener("keydown", keyDownEvent);
+      window.addEventListener("keyup", keyUpEvent);
       return () => {
         cancelAnimationFrame(id);
-        window.removeEventListener("keypress", keyboardEvent);
+        clearInterval(intervalId);
+        window.removeEventListener("keydown", keyDownEvent);
+        window.removeEventListener("keyup", keyUpEvent);
       };
     }
   }, [isMounted]);
 
-  // useEffect(() => {
-  //   if (isMounted) {
-  //     const player = playerRef.current;
-
-  //     window.addEventListener("keypress", keyboardEvent);
-  //     return () => {
-  //       window.removeEventListener("keypress", keyboardEvent);
-  //     };
-  //   }
-  // }, [isMounted]);
-
   return (
-    <div
-      style={{ width: "100vw", height: "100vh" }}
-      ref={canvasRef as RefObject<HTMLDivElement>}
-    />
+    <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+      <div ref={canvasRef as RefObject<HTMLDivElement>} />
+    </div>
   );
 };
 
