@@ -3,7 +3,7 @@ import * as THREE from "three";
 
 import { RefObject, useEffect, useRef, useState } from "react";
 
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+// import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   calMove,
   createCamera,
@@ -55,7 +55,7 @@ const Page = () => {
       const scene = sceneRef.current;
 
       canvasRef.current && canvasRef.current.appendChild(renderer.domElement);
-      const controls = new OrbitControls(camera, renderer.domElement);
+      // const controls = new OrbitControls(camera, renderer.domElement);
 
       const gauge = new Gauge({ initHP: 10, maxHP: 10 });
       const g = gauge.create();
@@ -86,7 +86,7 @@ const Page = () => {
         const list = scene.children.filter(
           (el: THREE.Mesh) => el.name === "monster"
         );
-        controls.update();
+        // controls.update();
 
         list.map((monster: THREE.Mesh, idx: number) => {
           const newPosition = calMove(
